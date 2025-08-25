@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Simulation_8200Academy
+namespace Smart_Frige1
 {
     internal class Program
     {
