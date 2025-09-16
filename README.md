@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-namespace Smart_Frige1
+namespace Smart_Frige
 {
-    internal class Program
+        internal class Program
     {
         public class Food
         {
@@ -185,9 +185,8 @@ namespace Smart_Frige1
                     }
                 }
             }
-            public List<Tuple<string, int>> Create_Shopping_List()
+            public void Create_Shopping_List()
             {
-                List<Tuple<string, int>> shopList = new List<Tuple<string, int>>();
                 foreach (Tuple<string, int> itemSet in this.itemsNeededInFrige)
                 {
                     foreach (Food food in this.foodsInFrige)
@@ -196,7 +195,7 @@ namespace Smart_Frige1
                         {
                             if(food.amount_in_frige < itemSet.Item2)
                             {
-                                shopList.Add(new Tuple<string, int>(food.name, itemSet.Item2 - food.amount_in_frige));
+                                shoppingList.Add(new Tuple<string, int>(food.name, itemSet.Item2 - food.amount_in_frige));
                                 shoppingListPrice += (itemSet.Item2 - food.amount_in_frige) * itemPrices[food.name];
                             }
                         }
@@ -207,13 +206,12 @@ namespace Smart_Frige1
                         {
                             if (drink.amount_in_frige < itemSet.Item2)
                             {
-                                shopList.Add(new Tuple<string, int>(drink.name, itemSet.Item2 - drink.amount_in_frige));
+                                shoppingList.Add(new Tuple<string, int>(drink.name, itemSet.Item2 - drink.amount_in_frige));
                                 shoppingListPrice += (itemSet.Item2 - drink.amount_in_frige) * itemPrices[drink.name];
                             }
                         }
                     }
                 }
-                return shopList;
             }
             public void UpdatePriceDictionary(string item, float price)
             {
@@ -304,30 +302,104 @@ namespace Smart_Frige1
         }
         static void Main(string[] args)
         {
+            Smart_Refrigerator Frige = new Smart_Refrigerator(new List<Tuple<string, int>>());
+            Console.WriteLine("Welcome To Your Smart Refrigerator's interface! We Are Glad To Have You!");
             string usersRequest = GetCommandFromUser();
             while (true)
             {
                 if(usersRequest.Equals("content of frige"))
                 {
-
+                    Console.WriteLine("The frige contains the following foods and drinks: ");
+                    foreach(Food food in Frige.foodsInFrige)
+                    {
+                        Console.Write(food.name + ",");
+                    }
+                    foreach (Drink drink in Frige.drinksInFrige)
+                    {
+                        Console.Write(drink.name + ",");
+                    }
                 }
                 else if(usersRequest.Equals("exp date of products"))
                 {
-
+                    Frige.Get_Alert_Of_Expiration();
                 }
                 else if (usersRequest.Equals("shopping list"))
                 {
-
+                    Frige.Create_Shopping_List();
+                    foreach(Tuple<string, int> itemSet in Frige.shoppingList)
+                    {
+                        Console.WriteLine(itemSet.Item1 + ":" + itemSet.Item2);
+                    }
                 }
                 else if (usersRequest.Equals("add comment"))
                 {
-                    Console.WriteLine("To what whould you like to add it?(Choose Food or Drink)");
+                    Console.WriteLine("To what whould you like to add it?(Enter Food or Drink)");
                     string itemType = Console.ReadLine();
+                    if(itemType =="Food")
+                    {
+                        Console.WriteLine("What's the name of the food?");
+                        string foodName = Console.ReadLine();
+                        Console.WriteLine("Enter your comment: ");
+                        string comment = Console.ReadLine();
+                        foreach(Food food in Frige.foodsInFrige)
+                        {
+                            if (food.name.Equals(foodName))
+                            {
+                                food.commentAboutFood = comment;
+                                Console.WriteLine("Comment Added!");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("What's the name of the drink?");
+                        string drinkName = Console.ReadLine();
+                        Console.WriteLine("Enter your comment: ");
+                        string comment = Console.ReadLine();
+                        foreach (Drink drink in Frige.drinksInFrige)
+                        {
+                            if (drink.name.Equals(drinkName))
+                            {
+                                drink.commentAboutDrink = comment;
+                                Console.WriteLine("Comment Added!");
+                            }
+                        }
+                    }
                 }
                 else if (usersRequest.Equals("add reminder"))
                 {
                     Console.WriteLine("To what whould you like to add it?(Choose Food or Drink)");
                     string itemType = Console.ReadLine();
+                    if (itemType == "Food")
+                    {
+                        Console.WriteLine("What's the name of the food?");
+                        string foodName = Console.ReadLine();
+                        Console.WriteLine("Enter your reminder: ");
+                        string reminder = Console.ReadLine();
+                        foreach (Food food in Frige.foodsInFrige)
+                        {
+                            if (food.name.Equals(foodName))
+                            {
+                                food.reminderRegardingFood = reminder;
+                                Console.WriteLine("Reminder Added!");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("What's the name of the drink?");
+                        string drinkName = Console.ReadLine();
+                        Console.WriteLine("Enter your reminder: ");
+                        string reminder = Console.ReadLine();
+                        foreach (Drink drink in Frige.drinksInFrige)
+                        {
+                            if (drink.name.Equals(drinkName))
+                            {
+                                drink.reminderRegardingDrink = reminder;
+                                Console.WriteLine("Reminder Added!");
+                            }
+                        }
+                    }
                 }
                 else if (usersRequest.Equals("exit"))
                 {
@@ -336,10 +408,10 @@ namespace Smart_Frige1
                 else
                 {
                     Console.WriteLine("I did not understand the command. Please try again!");
-                    usersRequest = GetCommandFromUser();
-
                 }
+                usersRequest = GetCommandFromUser();
             }
+            Console.WriteLine("Thank You! Have A Great Time!");
         }
     }
 }
