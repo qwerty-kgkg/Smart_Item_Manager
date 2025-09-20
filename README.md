@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Smart_Frige
+namespace Smart_Item_Manager
 {
         internal class Program
     {
