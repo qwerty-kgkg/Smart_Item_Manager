@@ -303,7 +303,7 @@ namespace Smart_Item_Manager
         static void Main(string[] args)
         {
             Smart_Refrigerator Frige = new Smart_Refrigerator(new List<Tuple<string, int>>());
-            Console.WriteLine("Welcome To Your Smart Refrigerator's interface! We Are Glad To Have You!");
+            Console.WriteLine("Welcome To Your Smart Refrigerator! We Are Glad To Have You!");
             string usersRequest = GetCommandFromUser();
             while (true)
             {
