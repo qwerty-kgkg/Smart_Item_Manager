@@ -1,24 +1,23 @@
-using System.Collections.Generic;
-
 namespace Smart_Item_Manager
 {
-        internal class Program
+    internal class Program
     {
-        public class Food
+        public abstract class Item
         {
-            public string name {  get; set; }
-            public int amount_in_frige {  get; set; }
-            public DateTime experationDate {  get; set; }
-            public string commentAboutFood {  get; set; }
-            public string reminderRegardingFood {  get; set; }
-
-            public Food(string name, int amount_in_frige, DateTime experationDate)
+            public string name { get; set; }
+            public int amount_in_frige { get; set; }
+            public DateTime experationDate { get; set; }
+            public string commentAboutItem {  get; set; }
+            public string reminderRegardingItem { get; set; }
+            public static int countTotalItemsCreated = 0;
+            protected Item(string name, int amount_in_frige, DateTime experationDate)
             {
                 this.name = name;
                 this.amount_in_frige = amount_in_frige;
                 this.experationDate = experationDate;
-                this.commentAboutFood = "";
-                this.reminderRegardingFood = "";
+                this.commentAboutItem = "";
+                this.reminderRegardingItem = "";
+                countTotalItemsCreated++;
             }
 
             public override bool Equals(object? obj)
@@ -36,21 +35,31 @@ namespace Smart_Item_Manager
                 return base.ToString();
             }
         }
-        public class Drink
+        public class Food : Item
         {
-            public string name {  get; set; }
-            public int amount_in_frige {  get; set; }
-            public DateTime experationDate {  get; set; }
-            public string commentAboutDrink { get; set; }
-            public string reminderRegardingDrink { get; set; }
-
-            public Drink(string name, int amount_in_frige, DateTime experationDate)
+            public Food(string name, int amount_in_frige, DateTime experationDate) : base(name, amount_in_frige, experationDate)
             {
-                this.name = name;
-                this.amount_in_frige = amount_in_frige;
-                this.experationDate = experationDate;
-                this.commentAboutDrink = "";
-                this.reminderRegardingDrink = "";
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return base.Equals(obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
+
+            public override string? ToString()
+            {
+                return base.ToString();
+            }
+        }
+        public class Drink : Item
+        {
+            public Drink(string name, int amount_in_frige, DateTime experationDate) : base(name, amount_in_frige, experationDate)
+            {
             }
             public override bool Equals(object? obj)
             {
@@ -69,7 +78,7 @@ namespace Smart_Item_Manager
         }
         public class ExpirationManager
         {
-            public Dictionary<string, DateTime> expirationDateDictionary {  get; set; }
+            public Dictionary<string, DateTime> expirationDateDictionary { get; set; }
 
             public ExpirationManager(List<Food> foodsInFrige, List<Drink> drinksInFrige)
             {
@@ -128,8 +137,8 @@ namespace Smart_Item_Manager
         }
         public class UserProfile
         {
-            public List<string> userPreferences {  get; set; }
-            public List<string> itmesUserCannotEat {  get; set; }
+            public List<string> userPreferences { get; set; }
+            public List<string> itmesUserCannotEat { get; set; }
             public List<string> favoriteItemsOfUser { get; set; }
 
             public UserProfile(List<string> userPreferences, List<string> itmesUserCannotEat, List<string> favoriteItemsOfUser)
@@ -154,18 +163,18 @@ namespace Smart_Item_Manager
                 return base.ToString();
             }
         }
-        public class Smart_Refrigerator
+        public class SmartItemManager
         {
-            public List<Food> foodsInFrige {  get; set; }
+            public List<Food> foodsInFrige { get; set; }
             public List<Drink> drinksInFrige { get; set; }
-            public Dictionary<string, float> itemPrices {  get; set; }
-            public List<Tuple<string, int>> itemsNeededInFrige {  get; set; }
-            public List<Tuple<string, int>> shoppingList {  get; set; }
-            public float shoppingListPrice {  get; set; }
+            public Dictionary<string, float> itemPrices { get; set; }
+            public List<Tuple<string, int>> itemsNeededInFrige { get; set; }
+            public List<Tuple<string, int>> shoppingList { get; set; }
+            public float shoppingListPrice { get; set; }
             ExpirationManager expirationManager { get; set; }
 
 
-            public Smart_Refrigerator(List<Tuple<string, int>> usersRequestForFoodInFrige)
+            public SmartItemManager(List<Tuple<string, int>> usersRequestForFoodInFrige)
             {
                 this.foodsInFrige = new List<Food>();
                 this.drinksInFrige = new List<Drink>();
@@ -177,7 +186,7 @@ namespace Smart_Item_Manager
             }
             public void Get_Alert_Of_Expiration()
             {
-                foreach(KeyValuePair<string, DateTime> keyValuePair in this.expirationManager.expirationDateDictionary)
+                foreach (KeyValuePair<string, DateTime> keyValuePair in this.expirationManager.expirationDateDictionary)
                 {
                     if (keyValuePair.Value <= DateTime.Now.AddDays(3))
                     {
@@ -191,9 +200,9 @@ namespace Smart_Item_Manager
                 {
                     foreach (Food food in this.foodsInFrige)
                     {
-                        if(food.name == itemSet.Item1)
+                        if (food.name == itemSet.Item1)
                         {
-                            if(food.amount_in_frige < itemSet.Item2)
+                            if (food.amount_in_frige < itemSet.Item2)
                             {
                                 shoppingList.Add(new Tuple<string, int>(food.name, itemSet.Item2 - food.amount_in_frige));
                                 shoppingListPrice += (itemSet.Item2 - food.amount_in_frige) * itemPrices[food.name];
@@ -238,7 +247,7 @@ namespace Smart_Item_Manager
             public void Update_Food_Taken_Out(Food food, int amountTakenOut)
             {
                 food.amount_in_frige -= amountTakenOut;
-                if(food.amount_in_frige <= 0)
+                if (food.amount_in_frige <= 0)
                 {
                     foodsInFrige.Remove(food);
                 }
@@ -302,15 +311,15 @@ namespace Smart_Item_Manager
         }
         static void Main(string[] args)
         {
-            Smart_Refrigerator Frige = new Smart_Refrigerator(new List<Tuple<string, int>>());
+            SmartItemManager Frige = new SmartItemManager(new List<Tuple<string, int>>());
             Console.WriteLine("Welcome To Your Smart Refrigerator! We Are Glad To Have You!");
             string usersRequest = GetCommandFromUser();
             while (true)
             {
-                if(usersRequest.Equals("content of frige"))
+                if (usersRequest.Equals("content of frige"))
                 {
                     Console.WriteLine("The frige contains the following foods and drinks: ");
-                    foreach(Food food in Frige.foodsInFrige)
+                    foreach (Food food in Frige.foodsInFrige)
                     {
                         Console.Write(food.name + ",");
                     }
@@ -319,14 +328,14 @@ namespace Smart_Item_Manager
                         Console.Write(drink.name + ",");
                     }
                 }
-                else if(usersRequest.Equals("exp date of products"))
+                else if (usersRequest.Equals("exp date of products"))
                 {
                     Frige.Get_Alert_Of_Expiration();
                 }
                 else if (usersRequest.Equals("shopping list"))
                 {
                     Frige.Create_Shopping_List();
-                    foreach(Tuple<string, int> itemSet in Frige.shoppingList)
+                    foreach (Tuple<string, int> itemSet in Frige.shoppingList)
                     {
                         Console.WriteLine(itemSet.Item1 + ":" + itemSet.Item2);
                     }
@@ -335,17 +344,17 @@ namespace Smart_Item_Manager
                 {
                     Console.WriteLine("To what whould you like to add it?(Enter Food or Drink)");
                     string itemType = Console.ReadLine();
-                    if(itemType =="Food")
+                    if (itemType == "Food")
                     {
                         Console.WriteLine("What's the name of the food?");
                         string foodName = Console.ReadLine();
                         Console.WriteLine("Enter your comment: ");
                         string comment = Console.ReadLine();
-                        foreach(Food food in Frige.foodsInFrige)
+                        foreach (Food food in Frige.foodsInFrige)
                         {
                             if (food.name.Equals(foodName))
                             {
-                                food.commentAboutFood = comment;
+                                food.commentAboutItem = comment;
                                 Console.WriteLine("Comment Added!");
                             }
                         }
@@ -360,7 +369,7 @@ namespace Smart_Item_Manager
                         {
                             if (drink.name.Equals(drinkName))
                             {
-                                drink.commentAboutDrink = comment;
+                                drink.commentAboutItem = comment;
                                 Console.WriteLine("Comment Added!");
                             }
                         }
@@ -380,7 +389,7 @@ namespace Smart_Item_Manager
                         {
                             if (food.name.Equals(foodName))
                             {
-                                food.reminderRegardingFood = reminder;
+                                food.reminderRegardingItem = reminder;
                                 Console.WriteLine("Reminder Added!");
                             }
                         }
@@ -395,7 +404,7 @@ namespace Smart_Item_Manager
                         {
                             if (drink.name.Equals(drinkName))
                             {
-                                drink.reminderRegardingDrink = reminder;
+                                drink.reminderRegardingItem = reminder;
                                 Console.WriteLine("Reminder Added!");
                             }
                         }
